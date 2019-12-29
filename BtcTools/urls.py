@@ -17,11 +17,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from lending import views
+
 
 urlpatterns = [
-    path('', views.index, name='home'),
-    path('lending/', views.lending),
     path('admin/', admin.site.urls),
     
 ]
