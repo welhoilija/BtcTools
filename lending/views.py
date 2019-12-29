@@ -7,8 +7,7 @@ from django.http import HttpResponse
 
 
 def index(request):
-    template = loader.get_template('lending/index.html')
-    #context = {
-
-    #}
     return render(request,'lending/index.html')
+
+def lending(request):
+    return render(request,"lending/Lending.html")

@@ -13,7 +13,7 @@ class Asset(models.Model):
     Description: Model Description
     """
     
-    ticker = models.CharField(max_length=10, min_length=3)
+    ticker = models.CharField(max_length=10)
     unit = models.CharField(max_length=50)
 
     description = models.TextField()
@@ -35,10 +35,10 @@ class Transaction(models.Model):
     created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=False, auto_now_add=True)
 
-    asset = models.ForeignKey(Asset)
+    asset = models.ForeignKey(Asset, on_delete=models.PROTECT)
 
-    from_account = models.ForeignKey('Account', null=True, default=None, related_name="from_transactions")
-    to_account = models.ForeignKey('Account', null=True, default=None, related_name="to_transactions")
+    from_account = models.ForeignKey('Account', null=True, default=None, related_name="from_transactions", on_delete=models.PROTECT)
+    to_account = models.ForeignKey('Account', null=True, default=None, related_name="to_transactions", on_delete=models.PROTECT)
 
     # via smallest possible precision
     amount = models.IntegerField()
@@ -62,7 +62,7 @@ class Account(models.Model):
 
     last_balance = models.IntegerField(default=0)
 
-    asset = models.ForeignKey(Asset)
+    asset = models.ForeignKey(Asset, on_delete=models.PROTECT)
 
     def calculate_total_balance(self):
         return self.from_transactions.aggregate(Sum('amount')) - self.to_transactions.aggregate(Sum('amount'))
