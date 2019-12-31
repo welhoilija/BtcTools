@@ -13,7 +13,7 @@ class Asset(models.Model):
     Description: Model Description
     """
     
-    ticker = models.CharField(max_length=10)
+    ticker = models.CharField(max_length=10, unique=True)
     unit = models.CharField(max_length=50)
 
     description = models.TextField()
@@ -33,7 +33,7 @@ class Transaction(models.Model):
     """
     
     created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=False, auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     asset = models.ForeignKey(Asset, on_delete=models.PROTECT)
 
@@ -50,6 +50,19 @@ class Transaction(models.Model):
     class Meta:
         pass
 
+class AssetAddress(models.Model):
+
+    created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
+    first_used_at = models.DateTimeField(null=True, default=None)
+    expired_at = models.DateTimeField(null=True, default=None)
+
+    received = models.IntegerField(default=0)
+
+    asset = models.ForeignKey(Asset, on_delete=models.PROTECT)
+
+    account = models.ForeignKey('Account', null=True, default=None)
+
+
 # Create your models here.
 
 class Account(models.Model):
@@ -58,7 +71,7 @@ class Account(models.Model):
     """
     
     created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=False, auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     last_balance = models.IntegerField(default=0)
 
@@ -91,5 +104,16 @@ class Account(models.Model):
         elif rows_updated > 1:
             raise Exception("multiple rows were updated")
 
+    def get_new_address(self):
+        address = AssetAddress.objects.filter(asset_id=self.asset_id, account=null).order_by('created_at').first()
+        if not address:
+            # TODO: request more addresses from daemon
+            raise Exception("No free addresses")
+        return address
+
     class Meta:
         pass
+
+
+
+
