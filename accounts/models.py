@@ -107,8 +107,14 @@ class Account(models.Model):
     def get_new_address(self):
         address = AssetAddress.objects.filter(asset_id=self.asset_id, account=null).order_by('created_at').first()
         if not address:
-            # TODO: request more addresses from daemon
+            # TODO: request more addresses from daemon ()
             raise Exception("No free addresses")
+        return address
+
+    def get_unused_address(self):
+        address = AssetAddress.objects.filter(asset_id=self.asset_id, account_id=self.id, first_used_at=None).order_by('created_at').first()
+        if not address:
+            return self.get_new_address()
         return address
 
     class Meta:
