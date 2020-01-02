@@ -63,6 +63,33 @@ class AssetAddress(models.Model):
     account = models.ForeignKey('Account', null=True, default=None)
 
 
+class IncomingTransaction(models.Model):
+    """
+    Incoming transaction
+    """
+    
+    created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
+    confirmed_at = models.DateTimeField(null=True, default=None)
+
+    asset = models.ForeignKey(Asset, on_delete=models.PROTECT)
+
+    address = models.ForeignKey('AssetAddress', attributes)
+
+    # via smallest possible precision
+    amount = models.IntegerField()
+
+    confirmations = models.IntegerField(default=0)
+
+    # unique identifier for transaction, for example for bitcoin txid:vout
+    tx_identifier = models.CharField(max_length=500)
+
+    # once transaction is credited to account, transaction object is created and this is set.
+    transaction = models.ForeignKey('Transaction', null=True, default=None)
+
+    class Meta:
+        pass
+
+
 # Create your models here.
 
 class Account(models.Model):
@@ -107,7 +134,7 @@ class Account(models.Model):
     def get_new_address(self):
         address = AssetAddress.objects.filter(asset_id=self.asset_id, account=null).order_by('created_at').first()
         if not address:
-            # TODO: request more addresses from daemon ()
+            # TODO: request more addresses from daemon (via background task, propably not a good idea to call synchronously)
             raise Exception("No free addresses")
         return address
 
