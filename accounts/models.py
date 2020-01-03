@@ -110,7 +110,7 @@ class Account(models.Model):
     created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    last_balance = models.IntegerField(default=0)
+    balance = models.IntegerField(default=0)
 
     asset = models.ForeignKey(Asset, on_delete=models.PROTECT)
 
