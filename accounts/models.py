@@ -12,11 +12,15 @@ class Asset(models.Model):
     """
     Description: Model Description
     """
-    
+
     ticker = models.CharField(max_length=10, unique=True)
     unit = models.CharField(max_length=50)
 
     description = models.TextField()
+
+
+    def __str__(self):
+        return self.ticker + " " + self.description
 
     class Meta:
         pass
@@ -60,7 +64,13 @@ class AssetAddress(models.Model):
 
     asset = models.ForeignKey(Asset, on_delete=models.PROTECT)
 
-    account = models.ForeignKey('Account', null=True, default=None)
+    address = models.TextField(default="")
+
+    account = models.ForeignKey('Account', null=True, default=None, on_delete=models.PROTECT)
+
+
+    def __str__(self):
+        return self.address
 
 
 class IncomingTransaction(models.Model):
@@ -73,7 +83,7 @@ class IncomingTransaction(models.Model):
 
     asset = models.ForeignKey(Asset, on_delete=models.PROTECT)
 
-    address = models.ForeignKey('AssetAddress', attributes)
+    address = models.ForeignKey('AssetAddress', on_delete=models.PROTECT)
 
     # via smallest possible precision
     amount = models.IntegerField()
@@ -84,7 +94,7 @@ class IncomingTransaction(models.Model):
     tx_identifier = models.CharField(max_length=500)
 
     # once transaction is credited to account, transaction object is created and this is set.
-    transaction = models.ForeignKey('Transaction', null=True, default=None)
+    transaction = models.ForeignKey('Transaction', null=True, default=None, on_delete=models.PROTECT)
 
     class Meta:
         pass
@@ -132,14 +142,14 @@ class Account(models.Model):
             raise Exception("multiple rows were updated")
 
     def get_new_address(self):
-        address = AssetAddress.objects.filter(asset_id=self.asset_id, account=null).order_by('created_at').first()
+        address = AssetAddress.objects.filter(asset_id=self.asset, account=null).order_by('created_at').first()
         if not address:
             # TODO: request more addresses from daemon (via background task, propably not a good idea to call synchronously)
             raise Exception("No free addresses")
         return address
 
     def get_unused_address(self):
-        address = AssetAddress.objects.filter(asset_id=self.asset_id, account_id=self.id, first_used_at=None).order_by('created_at').first()
+        address = AssetAddress.objects.filter(asset_id=self.asset, account_id=self.id, first_used_at=None).order_by('created_at').first()
         if not address:
             return self.get_new_address()
         return address
