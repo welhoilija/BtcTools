@@ -102,7 +102,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+RPC_USER = "stupido"
+RPC_PASSWORD = "stupido"
 # Internationalization
 # https://docs.djangoproject.com/en/dev/topics/i18n/
 
@@ -122,7 +123,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+
 try:
-    from local_settings import *
+    from BtcTools.local_settings import *
 except ImportError:
     pass

@@ -1,10 +1,10 @@
 from accounts.models import *
 from bitcoinrpc.authproxy import AuthServiceProxy, JSONRPCException
-from BtcTools.local_settings import rpc_user, rpc_password
+from django.conf import settings
 
 def BTC_refill_address_queue():
     # TODO: move daemon connection string to settings!
-    rpc_connection = AuthServiceProxy("http://%s:%s@127.0.0.1:18332"%(rpc_user, rpc_password))
+    rpc_connection = AuthServiceProxy("http://%s:%s@127.0.0.1:18332"%(settings.RPC_USER, settings.RPC_PASSWORD))
     # try to keep always 1000 address objects ready
     addresses_needed = 1000 - AssetAddress.objects.filter(asset_id=1, account=None).count()
     for i in range(1, addresses_needed):
