@@ -51,6 +51,9 @@ class Transaction(models.Model):
 
     tx_type = models.IntegerField(choices=TxType.choices)
 
+    def __str__(self):
+        return self.from_account + ", " + self.to_account
+
     class Meta:
         pass
 
@@ -114,6 +117,12 @@ class Account(models.Model):
 
     asset = models.ForeignKey(Asset, on_delete=models.PROTECT)
 
+
+    def assign_new_address(self):
+        #TODO catch a new address and assign it to account in question
+        return
+
+
     def calculate_total_balance(self):
         return self.from_transactions.aggregate(Sum('amount')) - self.to_transactions.aggregate(Sum('amount'))
 
@@ -142,7 +151,7 @@ class Account(models.Model):
             raise Exception("multiple rows were updated")
 
     def get_new_address(self):
-        address = AssetAddress.objects.filter(asset_id=self.asset, account=null).order_by('created_at').first()
+        address = AssetAddress.objects.filter(asset_id=self.asset, account=None).order_by('created_at').first()
         if not address:
             # TODO: request more addresses from daemon (via background task, propably not a good idea to call synchronously)
             raise Exception("No free addresses")
@@ -153,6 +162,7 @@ class Account(models.Model):
         if not address:
             return self.get_new_address()
         return address
+
 
     class Meta:
         pass
