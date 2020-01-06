@@ -8,7 +8,12 @@ def BTC_refill_address_queue():
     # try to keep always 1000 address objects ready
     addresses_needed = 1000 - AssetAddress.objects.filter(asset_id=1, account=None).count()
     for i in range(1, addresses_needed):
-        address_string = daemon_connection.getnewaddress()
+        try:
+            address_string = daemon_connection.getnewaddress()
+            pass
+        except JSONRPCException as e:
+            raise Exception("Daemon connection failed")
+        
         # TODO: validate address, raise Exception if daemon returrns something that is not excepted
         if 26 <= len(address_string) <= 35:
             AssetAddress.objects.create(address=address_string, account=None, asset_id=1)

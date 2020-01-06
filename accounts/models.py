@@ -118,10 +118,6 @@ class Account(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.PROTECT)
 
 
-    def assign_new_address(self):
-        #TODO catch a new address and assign it to account in question
-        return
-
 
     def calculate_total_balance(self):
         return self.from_transactions.aggregate(Sum('amount')) - self.to_transactions.aggregate(Sum('amount'))
@@ -152,6 +148,8 @@ class Account(models.Model):
 
     def get_new_address(self):
         address = AssetAddress.objects.filter(asset_id=self.asset, account=None).order_by('created_at').first()
+        address.account=self
+        address.save(update_fields=['account'])
         if not address:
             # TODO: request more addresses from daemon (via background task, propably not a good idea to call synchronously)
             raise Exception("No free addresses")
