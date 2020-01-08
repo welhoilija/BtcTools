@@ -147,13 +147,15 @@ class Account(models.Model):
             raise Exception("multiple rows were updated")
 
     def get_new_address(self):
-        address = AssetAddress.objects.filter(asset_id=self.asset, account=None).order_by('created_at').first()
-        address.account=self
-        address.save(update_fields=['account'])
-        if not address:
-            # TODO: request more addresses from daemon (via background task, propably not a good idea to call synchronously)
-            raise Exception("No free addresses")
-        return address
+        while True:
+            address = AssetAddress.objects.filter(asset_id=self.asset, account=None).order_by('created_at').first()
+            if not address:
+                # TODO: maybe generate new addresses on fly?
+                raise Exception("No free addresses")
+            address.account = self
+            rows_updated = AssetAddress.objects.filter(id=address.id, account=None).update(account_id=self.id)
+            if rows_updated:
+                return address
 
     def get_unused_address(self):
         address = AssetAddress.objects.filter(asset_id=self.asset, account_id=self.id, first_used_at=None).order_by('created_at').first()
