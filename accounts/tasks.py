@@ -31,7 +31,7 @@ def BTC_check_incoming_transactions(address):
     # TODO:
     # connect to the BTC daemon
     # get latest transactions with listtransactions, listsinceblock or similar
-    daemon_connection = AuthServiceProxy("http://%s:%s@127.0.0.1:18332"%(rpc_user, rpc_password))
+    daemon_connection = AuthServiceProxy("http://%s:%s@127.0.0.1:18332"%(settings.RPC_USER, settings.RPC_PASSWORD))
     recent_transactions = daemon_connection.listtransactions("*", 100)
 
     # PSEUDOCODE:
@@ -39,14 +39,15 @@ def BTC_check_incoming_transactions(address):
         tx_id = tx["txid"]
         amount = tx["amount"]
         vout = tx["vout"]
+        TXidentifier = str(tx_id) + ":" + str(vout)
 
         # first look if transaction is already registered & confirmed, if that happens, continue
         # TODO
 
         # try to look for incoming transaction, if not found create one
-        incoming_txs = IncomingTransaction.objects.filter(address = address)
+        incoming_txs = IncomingTransaction.objects.filter(tx_identifier = TXidentifier)
         if incoming_txs.count() < 1:
-            inc_tx = IncomingTransaction.objects.create(asset_id=1, address=address, amount=amount, confirmations=tx["confirmations"], tx_identifier=tx_id + ":" + vout, transaction=transaction)
+            inc_tx = IncomingTransaction.objects.create(asset_id=1, address=address, amount=amount, confirmations=tx["confirmations"], tx_identifier=TXidentifier, transaction=transaction)
         else:
             incoming_tx = incoming_txs.first()
 
