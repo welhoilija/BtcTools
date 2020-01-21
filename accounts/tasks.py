@@ -27,7 +27,7 @@ def refill_address_queue():
     BTC_refill_address_queue()
 
 
-def BTC_check_incoming_transactions(address):
+def BTC_check_incoming_transactions():
     # TODO:
     # connect to the BTC daemon
     # get latest transactions with listtransactions, listsinceblock or similar
@@ -38,15 +38,17 @@ def BTC_check_incoming_transactions(address):
     for tx in recent_transactions:
         tx_id = tx["txid"]
         amount = tx["amount"]
+        satoshi_amount= int(amount.ToString.replace(".", ""))
         vout = tx["vout"]
         TXidentifier = str(tx_id) + ":" + str(vout)
+        txaddress = tx["address"]
 
         # first look if transaction is already registered & confirmed, if that happens, continue
         # TODO
 
         # try to look for incoming transaction, if not found create one
-        incoming_txs = IncomingTransaction.objects.get(tx_identifier = TXidentifier)
-        asaddress = AssetAddress.objects.filter(address=tx["address"])
+        incoming_txs = IncomingTransaction.objects.filter(tx_identifier = TXidentifier)
+        asaddress = AssetAddress.objects.get(address=txaddress)
         if incoming_txs.count() < 1:
             inc_tx = IncomingTransaction.objects.create(asset_id=1, address=asaddress, amount=amount, confirmations=tx["confirmations"], tx_identifier=TXidentifier, transaction=None)
         else:
@@ -55,9 +57,9 @@ def BTC_check_incoming_transactions(address):
         # and finally, if incoming transaction has enough confirmations credit it to the account
         # TODO 
         if tx["confirmations"]>=2:
-            Address_account_id = AssetAddress.objects.get(address=address)
-            ac = Account.objects.get(id=Address_account_id)
-            ac.balance += amount
+            address = AssetAddress.objects.get(address=address)
+            accountid = address.account_id
+            Account.objects.filter(id=accountid).update(balance =+ satoshi_amount)
 
 def check_incoming_transactions():
     # fetch new addresses here from the daemon
