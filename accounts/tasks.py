@@ -59,7 +59,18 @@ def BTC_check_incoming_transactions():
         if tx["confirmations"]>=2:
             address = AssetAddress.objects.get(address=address)
             accountid = address.account_id
-            Account.objects.filter(id=accountid).update(balance =+ satoshi_amount)
+            account = Account.objects.get(id = accountid)
+            new_balance = self.last_balance + satoshi_amount
+            rows_updated = Account.objects.filter(id = accountid, last_balance=self.last_balance).update(last_balance=new_balance)
+
+            if rows_updated == 1:
+                account.update(balance += satoshi_amount)
+                account.save()
+
+
+                
+
+
 
 def check_incoming_transactions():
     # fetch new addresses here from the daemon
