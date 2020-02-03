@@ -67,6 +67,10 @@ def BTC_check_incoming_transactions():
                 account.update(balance += satoshi_amount)
                 account.save()
 
+            if rows_updated != 1:
+                #alert administrator etc.
+                pass
+
 
                 
 
