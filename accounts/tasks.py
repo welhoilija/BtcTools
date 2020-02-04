@@ -44,7 +44,6 @@ def BTC_check_incoming_transactions():
         txaddress = tx["address"]
 
         # first look if transaction is already registered & confirmed, if that happens, continue
-        # TODO
 
         # try to look for incoming transaction, if not found create one
         incoming_txs = IncomingTransaction.objects.filter(tx_identifier = TXidentifier)
@@ -55,21 +54,20 @@ def BTC_check_incoming_transactions():
             incoming_tx = incoming_txs.first()
 
         # and finally, if incoming transaction has enough confirmations credit it to the account
-        # TODO 
         if tx["confirmations"]>=2:
-            address = AssetAddress.objects.get(address=address)
+            address = AssetAddress.objects.get(address=txaddress)
             accountid = address.account_id
             account = Account.objects.get(id = accountid)
             new_balance = self.last_balance + satoshi_amount
-            rows_updated = Account.objects.filter(id = accountid, last_balance=self.last_balance).update(last_balance=new_balance)
-
+            rows_updated = Account.objects.filter(id = accountid, balance=accoount.balance)
             if rows_updated == 1:
-                account.update(balance += satoshi_amount)
-                account.save()
+                tx = Transaction.objects.create(from_account=none, to_account=account, amount=satoshi_amount, tx_type=TxType.DEPOSIT,
+                    from_balance=none)
+                rows_updated_2 = Account.objects.filter(id=other_account.id).update(balance=F('balance') + satoshi_amount)
+                if rows_updated_2 < 1:
+                    #alert admin
+                    pass
 
-            if rows_updated != 1:
-                #alert administrator etc.
-                pass
 
 
                 
