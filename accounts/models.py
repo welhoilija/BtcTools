@@ -46,6 +46,7 @@ class Transaction(models.Model):
 
     # via smallest possible precision
     amount = models.IntegerField()
+    #balances before tx
     from_balance = models.IntegerField(null=True, default=None)
     to_balance = models.IntegerField(null=True, default=None)
 

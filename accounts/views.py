@@ -16,17 +16,25 @@ def AccountViewbyid(request, Account_id):
 
     output = ', '.join([str(response.balance), str(response.asset), str(response.created_at)] + addresslist)
 
+    return HttpResponse(output)
 
+
+def AssetAddressViewbyid(request, Account_id):
+    List = []
+    for a in AssetAddress.objects.filter(account_id=Account_id):
+        List.append(str(a.address))
+
+    output = ", ".join(List)
 
     return HttpResponse(output)
 
 
-
 def AssetAddressView(request):
-    List = AssetAddress.objects.get(account=True)
-    output = ", ".join([str(a.address) , str(a.Account_id)])
-    
-    
+    Addresses= AssetAddress.objects.filter(account_id=2)
+    List = []
+    for a in Addresses:
+        List.append(a.address)
 
+    output = ", ".join(List)
 
     return HttpResponse(output)
