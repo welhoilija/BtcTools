@@ -59,14 +59,15 @@ def BTC_check_incoming_transactions():
             accountid = address.account_id
             account = Account.objects.get(id = accountid)
             new_balance = account.balance + satoshi_amount
-            rows_updated = Account.objects.filter(id = accountid, balance=account.balance)
-            if rows_updated == 1:
-                tx = Transaction.objects.create(from_account=none, to_account=account, amount=satoshi_amount, tx_type=TxType.DEPOSIT,
-                    from_balance=none)
-                rows_updated_2 = Account.objects.filter(id=other_account.id).update(balance=F('balance') + satoshi_amount)
+            rows_updated = Account.objects.filter(id = accountid, balance=account.balance).update()
+            if rows_updated == 0:
+                tx = Transaction.objects.create(asset_id=1, from_account=None, to_account=account, amount=satoshi_amount, tx_type=TxType.DEPOSIT,
+                    from_balance=None)
+                rows_updated_2 = Account.objects.filter(id=account.id).update(balance=F('balance') + satoshi_amount)
                 if rows_updated_2 < 1:
                     #alert admin
                     pass
+
 
 
 
