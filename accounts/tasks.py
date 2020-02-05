@@ -38,7 +38,7 @@ def BTC_check_incoming_transactions():
     for tx in recent_transactions:
         tx_id = tx["txid"]
         amount = tx["amount"]
-        satoshi_amount= int(amount.ToString.replace(".", ""))
+        satoshi_amount= int(str(amount).replace(".", ""))
         vout = tx["vout"]
         TXidentifier = str(tx_id) + ":" + str(vout)
         txaddress = tx["address"]
@@ -58,8 +58,8 @@ def BTC_check_incoming_transactions():
             address = AssetAddress.objects.get(address=txaddress)
             accountid = address.account_id
             account = Account.objects.get(id = accountid)
-            new_balance = self.last_balance + satoshi_amount
-            rows_updated = Account.objects.filter(id = accountid, balance=accoount.balance)
+            new_balance = account.balance + satoshi_amount
+            rows_updated = Account.objects.filter(id = accountid, balance=account.balance)
             if rows_updated == 1:
                 tx = Transaction.objects.create(from_account=none, to_account=account, amount=satoshi_amount, tx_type=TxType.DEPOSIT,
                     from_balance=none)
