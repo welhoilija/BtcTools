@@ -49,7 +49,7 @@ def BTC_check_incoming_transactions():
         incoming_txs = IncomingTransaction.objects.filter(tx_identifier = TXidentifier)
         asaddress = AssetAddress.objects.get(address=txaddress)
         if incoming_txs.count() < 1:
-            inc_tx = IncomingTransaction.objects.create(asset_id=1, address=asaddress, amount=amount, confirmations=tx["confirmations"], tx_identifier=TXidentifier, transaction=None)
+            incoming_tx = IncomingTransaction.objects.create(asset_id=1, address=asaddress, amount=amount, confirmations=tx["confirmations"], tx_identifier=TXidentifier, transaction=None)
         else:
             incoming_tx = incoming_txs.first()
 
