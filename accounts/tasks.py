@@ -58,7 +58,7 @@ def BTC_check_incoming_transactions():
             address = AssetAddress.objects.get(address=txaddress)
             accountid = address.account_id
             account = Account.objects.get(id = accountid)
-            new_balance = self.last_balance + satoshi_amount
+            new_balance = account.balance + satoshi_amount
 
             rows_updated = Account.objects.filter(id = accountid, balance=accoount.balance)
 
